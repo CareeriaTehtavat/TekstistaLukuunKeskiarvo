@@ -11,8 +11,8 @@ namespace HelloWorldTest
 
         //Harjoitus - PeruslaskutNumeromuuttujilla
         [Fact]
-        [Trait("TestGroup", "TekstistaLukuun")]
-        public void TekstistaLukuun()
+        [Trait("TestGroup", "TekstistaLukuunKeskiarvo")]
+        public void TekstistaLukuunKeskiarvo()
         {
             // Arrange
             using var sw = new StringWriter();
@@ -38,11 +38,19 @@ namespace HelloWorldTest
                 var result = sw.ToString().TrimEnd(); // Trim only the end of the string
                 var resultLines = result.Split(new[] { "\r\n", "\n" }, StringSplitOptions.None);
                 // Define a regex pattern to match the structure, ignoring specific values
+                string teksti1 = "10,4";
+                string teksti2 = "8,2";
+                string teksti3 = "5,1";
+
+                double luku1 = Convert.ToDouble(teksti1);
+                double luku2 = Convert.ToDouble(teksti2);
+                double luku3 = Convert.ToDouble(teksti3);
+
+                double keskiarvo = (luku1 + luku2 + luku3) / 3;
+
 
                 // Assert: Check if the result matches the expected structure
-                Assert.True(LineContainsIgnoreSpaces(resultLines[0], "11"), "Line does not contain expected text: " + resultLines[0] + ", expected text: " + "11");
-                Assert.True(LineContainsIgnoreSpaces(resultLines[1], "2"), "Line does not contain expected text: " + resultLines[1]);
-                Assert.True(LineContainsIgnoreSpaces(resultLines[2], "11"), "Line does not contain expected text: " + resultLines[2]);
+                Assert.True(LineContainsIgnoreSpaces(resultLines[0], "Tekstinä syötettyjen lukujen " + teksti1 + " " + teksti2 + " ja " + teksti3 + " keskiarvo on " + keskiarvo), "Line does not contain expected text: " + resultLines[0] + ", expected text: " + "11");
             }
             catch (OperationCanceledException)
             {
@@ -90,5 +98,6 @@ namespace HelloWorldTest
 
     }
 }
+
 
 
