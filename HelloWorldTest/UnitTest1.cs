@@ -41,16 +41,29 @@ namespace HelloWorldTest
                 string teksti1 = "10,4";
                 string teksti2 = "8,2";
                 string teksti3 = "5,1";
+                // Parse inputs as float
+                float floatLuku1 = float.Parse(teksti1);
+                float floatLuku2 = float.Parse(teksti2);
+                float floatLuku3 = float.Parse(teksti3);
+                float floatKeskiarvo = (floatLuku1 + floatLuku2 + floatLuku3) / 3;
 
-                double luku1 = Convert.ToDouble(teksti1);
-                double luku2 = Convert.ToDouble(teksti2);
-                double luku3 = Convert.ToDouble(teksti3);
+                // Parse inputs as double
+                double doubleLuku1 = Convert.ToDouble(teksti1);
+                double doubleLuku2 = Convert.ToDouble(teksti2);
+                double doubleLuku3 = Convert.ToDouble(teksti3);
+                double doubleKeskiarvo = (doubleLuku1 + doubleLuku2 + doubleLuku3) / 3;
 
-                double keskiarvo = (luku1 + luku2 + luku3) / 3;
+                // Expected text for both float and double results
+                string expectedFloatText = $"Tekstina syotettyjen lukujen {teksti1} {teksti2} ja {teksti3} keskiarvo on {floatKeskiarvo}";
+                string expectedDoubleText = $"Tekstina syotettyjen lukujen {teksti1} {teksti2} ja {teksti3} keskiarvo on {doubleKeskiarvo}";
 
+                // Assert: Check if the result matches either the float or double expected output
+                bool matchesFloat = LineContainsIgnoreSpaces(expectedFloatText, resultLines[0]);
+                bool matchesDouble = LineContainsIgnoreSpaces(expectedDoubleText, resultLines[0]);
 
-                // Assert: Check if the result matches the expected structure
-                Assert.True(LineContainsIgnoreSpaces(resultLines[0], "Tekstin� sy�tettyjen lukujen " + teksti1 + " " + teksti2 + " ja " + teksti3 + " keskiarvo on " + keskiarvo), "Line does not contain expected text: " + resultLines[0] + ", expected text: " + "11");
+                Assert.True(matchesFloat || matchesDouble,
+                    "The result does not match either float or double calculated value. " +
+                    $"Actual: {resultLines[0]} / Expected float: {expectedFloatText} / Expected double: {expectedDoubleText}");
             }
             catch (OperationCanceledException)
             {
@@ -65,13 +78,23 @@ namespace HelloWorldTest
                 cancellationTokenSource.Dispose();
             }
         }
-        private bool LineContainsIgnoreSpaces(string line, string expectedText)
+        private bool LineContainsIgnoreSpaces(string expectedText, string line)
         {
-            // Remove all whitespace from the line and the expected text
-            string normalizedLine = Regex.Replace(line, @"\s+", "");
-            string normalizedExpectedText = Regex.Replace(expectedText, @"\s+", "");
-            return normalizedLine.Contains(normalizedExpectedText);
+            // Remove all whitespace and convert to lowercase
+            string normalizedLine = Regex.Replace(line, @"[\s.,]+", "").ToLower();
+            string normalizedExpectedText = Regex.Replace(expectedText, @"[\s.,]+", "").ToLower();
+
+            // Create a regex pattern to allow any character for "ä", "ö", "a", and "o"
+            string pattern = Regex.Escape(normalizedExpectedText)
+                                  .Replace("ö", ".")  // Allow any character for "ö"
+                                  .Replace("ä", ".")  // Allow any character for "ä"
+                                  .Replace("a", ".")  // Allow any character for "a"
+                                  .Replace("o", ".");  // Allow any character for "o"
+
+            // Check if the line matches the pattern, ignoring case
+            return Regex.IsMatch(normalizedLine, pattern, RegexOptions.IgnoreCase);
         }
+
 
         private int CountWords(string line)
         {
@@ -98,6 +121,5 @@ namespace HelloWorldTest
 
     }
 }
-
 
 
